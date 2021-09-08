@@ -3,11 +3,11 @@
 
 #include <iostream>
 
-extern "C" __int64 *add_avx256f();
+extern "C" void add_avx256f();
 
 int main()
 {
-    __int64 *test =  add_avx256f();
+    add_avx256f();
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu

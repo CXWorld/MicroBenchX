@@ -63,5 +63,5 @@ add_avx256f:
 section .data
 
 format: db "%lu", 10, 0
-align 16
+align 32
 avx_iv: dd 8.0, 7.0, 6.0, 5.0, 4.0, 3.0, 2.0, 1.0
