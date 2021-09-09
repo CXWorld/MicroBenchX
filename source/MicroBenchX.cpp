@@ -2,12 +2,14 @@
 //
 
 #include <iostream>
+#include <stdio.h>
 
-extern "C" void add_avx256f();
+// unsigned long
+extern "C" unsigned long add_avx256f();
 
 int main()
 {
-    add_avx256f();
+    unsigned long add_avx256_Iterations = add_avx256f();
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu

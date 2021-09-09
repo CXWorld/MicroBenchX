@@ -3,7 +3,7 @@
 %include "parameters.inc"
 
 extern exit
-; extern printf
+extern printf
 
 global add_avx256f
 
@@ -50,14 +50,11 @@ add_avx256f:
 	jnz .loop
 .exit:
     lea rdi, [rel format]
-    mov rax, ITERATIONS_add_avx256f
-    mov rsi, 16
-    mul rsi
-    mov rsi, rax
-    xor rax, rax
-	; call printf wrt ..plt
-    pop rbp
+	pop rbp
 	xor rax, rax
+	mov rax, ITERATIONS_add_avx256f
+    mov rsi, 18 ; 16 vaddps + 1 dec + 1 loop
+	mul rsi
     ret
 
 section .data
