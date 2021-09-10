@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Source Files\IpcTests">
+      <UniqueIdentifier>{6626eb99-6612-4ffe-a250-2e337af6c072}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MicroBenchX.cpp">
@@ -20,8 +23,113 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <NASM Include="add_avx256_float.asm">
-      <Filter>Source Files</Filter>
+    <NASM Include="IpcTests\add_avx256_float.asm">
+      <Filter>Source Files\IpcTests</Filter>
+    </NASM>
+    <NASM Include="IpcTests\add_avx256_int.asm">
+      <Filter>Source Files\IpcTests</Filter>
+    </NASM>
+    <NASM Include="IpcTests\add_avx512_float.asm">
+      <Filter>Source Files\IpcTests</Filter>
+    </NASM>
+    <NASM Include="IpcTests\add_avx512_int.asm">
+      <Filter>Source Files\IpcTests</Filter>
+    </NASM>
+    <NASM Include="IpcTests\add_int64.asm">
+      <Filter>Source Files\IpcTests</Filter>
+    </NASM>
+    <NASM Include="IpcTests\add_sse128_float.asm">
+      <Filter>Source Files\IpcTests</Filter>
+    </NASM>
+    <NASM Include="IpcTests\add_sse128_int.asm">
+      <Filter>Source Files\IpcTests</Filter>
+    </NASM>
+    <NASM Include="IpcTests\and_int64.asm">
+      <Filter>Source Files\IpcTests</Filter>
+    </NASM>
+    <NASM Include="IpcTests\div_avx256_float.asm">
+      <Filter>Source Files\IpcTests</Filter>
+    </NASM>
+    <NASM Include="IpcTests\div_avx512_float.asm">
+      <Filter>Source Files\IpcTests</Filter>
+    </NASM>
+    <NASM Include="IpcTests\div_int64.asm">
+      <Filter>Source Files\IpcTests</Filter>
+    </NASM>
+    <NASM Include="IpcTests\div_sse128_float.asm">
+      <Filter>Source Files\IpcTests</Filter>
+    </NASM>
+    <NASM Include="IpcTests\int_fp_mix.asm">
+      <Filter>Source Files\IpcTests</Filter>
+    </NASM>
+    <NASM Include="IpcTests\madd_avx256_float.asm">
+      <Filter>Source Files\IpcTests</Filter>
+    </NASM>
+    <NASM Include="IpcTests\madd_sse128_float.asm">
+      <Filter>Source Files\IpcTests</Filter>
+    </NASM>
+    <NASM Include="IpcTests\mov_int64.asm">
+      <Filter>Source Files\IpcTests</Filter>
+    </NASM>
+    <NASM Include="IpcTests\movdep_int64.asm">
+      <Filter>Source Files\IpcTests</Filter>
+    </NASM>
+    <NASM Include="IpcTests\movself_int64.asm">
+      <Filter>Source Files\IpcTests</Filter>
+    </NASM>
+    <NASM Include="IpcTests\mul_avx256_float.asm">
+      <Filter>Source Files\IpcTests</Filter>
+    </NASM>
+    <NASM Include="IpcTests\mul_avx256_int.asm">
+      <Filter>Source Files\IpcTests</Filter>
+    </NASM>
+    <NASM Include="IpcTests\mul_avx512_float.asm">
+      <Filter>Source Files\IpcTests</Filter>
+    </NASM>
+    <NASM Include="IpcTests\mul_avx512_int.asm">
+      <Filter>Source Files\IpcTests</Filter>
+    </NASM>
+    <NASM Include="IpcTests\mul_int64.asm">
+      <Filter>Source Files\IpcTests</Filter>
+    </NASM>
+    <NASM Include="IpcTests\mul_sse128_float.asm">
+      <Filter>Source Files\IpcTests</Filter>
+    </NASM>
+    <NASM Include="IpcTests\mul_sse128_int.asm">
+      <Filter>Source Files\IpcTests</Filter>
+    </NASM>
+    <NASM Include="IpcTests\or_int64.asm">
+      <Filter>Source Files\IpcTests</Filter>
+    </NASM>
+    <NASM Include="IpcTests\sub_avx256_float.asm">
+      <Filter>Source Files\IpcTests</Filter>
+    </NASM>
+    <NASM Include="IpcTests\sub_avx256_int.asm">
+      <Filter>Source Files\IpcTests</Filter>
+    </NASM>
+    <NASM Include="IpcTests\sub_avx512_float.asm">
+      <Filter>Source Files\IpcTests</Filter>
+    </NASM>
+    <NASM Include="IpcTests\sub_avx512_int.asm">
+      <Filter>Source Files\IpcTests</Filter>
+    </NASM>
+    <NASM Include="IpcTests\sub_int64.asm">
+      <Filter>Source Files\IpcTests</Filter>
+    </NASM>
+    <NASM Include="IpcTests\sub_sse128_float.asm">
+      <Filter>Source Files\IpcTests</Filter>
+    </NASM>
+    <NASM Include="IpcTests\sub_sse128_int.asm">
+      <Filter>Source Files\IpcTests</Filter>
+    </NASM>
+    <NASM Include="IpcTests\xor_int64.asm">
+      <Filter>Source Files\IpcTests</Filter>
+    </NASM>
+    <NASM Include="IpcTests\zen_fpu_mix_21.asm">
+      <Filter>Source Files\IpcTests</Filter>
+    </NASM>
+    <NASM Include="IpcTests\zen_fpu_mix_22.asm">
+      <Filter>Source Files\IpcTests</Filter>
     </NASM>
   </ItemGroup>
   <ItemGroup>

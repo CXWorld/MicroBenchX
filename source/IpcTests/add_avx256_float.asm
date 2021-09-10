@@ -3,13 +3,12 @@
 %include "parameters.inc"
 
 extern exit
-extern printf
 
-global add_avx256f
+global add_avx256_float
 
 section .text
 
-add_avx256f:
+add_avx256_float:
     push rbp
 	mov rax, ITERATIONS_add_avx256f
     lea rbx, [rel avx_iv]
