@@ -8,6 +8,7 @@ global div_avx256_float
 
 section .text
 
+; AVX instrucions: https://docs.oracle.com/cd/E36784_01/html/E36859/gntbd.html
 div_avx256_float:
     push rbp
 	mov rax, ITERATIONS_div_avx256f

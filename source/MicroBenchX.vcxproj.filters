@@ -21,6 +21,9 @@
     <ClCompile Include="MicroBenchX.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="InstructionSet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <NASM Include="IpcTests\add_avx256_float.asm">
@@ -136,5 +139,10 @@
     <None Include="parameters.inc">
       <Filter>Source Files</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="InstructionSet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

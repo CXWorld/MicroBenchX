@@ -141,6 +141,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="InstructionSet.cpp" />
     <ClCompile Include="MicroBenchX.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -183,6 +184,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="parameters.inc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="InstructionSet.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
