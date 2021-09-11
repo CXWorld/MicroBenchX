@@ -57,7 +57,8 @@ void PrintIpcResults(const std::string testName, const uint64_t instructions,
 int main()
 {
 	std::cout << "MircoBenchX v1.0 - CPU IPC micro benchmarks \n\n";
-	std::cout << "[!] Set a fixed clock speed before running the test. [!]\n";
+	std::cout << "[!] Set a fixed clock speed before running the test. [!]\n\n";
+	std::cout << InstructionSet::Brand().c_str() << "\n";
 	std::cout << "Please enter the CPU clock speed in MHz: ";
 	uint64_t clockSpeed_MHz;
 	std::cin >> clockSpeed_MHz;
@@ -119,7 +120,7 @@ int main()
 	uint64_t add_int64_Iterations = add_int64();
 	ftime(&end);
 	time_diff_ms = 1000 * (end.time - start.time) + (end.millitm - start.millitm);
-	PrintIpcResults("Add Interger 64", add_int64_Iterations, time_diff_ms, clockSpeed_MHz);
+	PrintIpcResults("Add Integer 64", add_int64_Iterations, time_diff_ms, clockSpeed_MHz);
 
 	ftime(&start);
 	uint64_t add_sse128_float_Iterations = add_sse128_float();
