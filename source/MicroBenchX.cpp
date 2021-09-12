@@ -56,7 +56,7 @@ void PrintIpcResults(const std::string testName, const uint64_t instructions,
 
 int main()
 {
-	std::cout << "MircoBenchX v1.0 - CPU IPC micro benchmarks \n\n";
+	std::cout << "MicroBenchX v1.0 - CPU IPC micro benchmarks \n\n";
 	std::cout << "[!] Set a fixed clock speed before running the test. [!]\n\n";
 	std::cout << InstructionSet::Brand().c_str() << "\n";
 	std::cout << "Please enter the CPU clock speed in MHz: ";
