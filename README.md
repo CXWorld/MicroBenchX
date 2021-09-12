@@ -1,5 +1,5 @@
 # MicroBenchX
-Micro benchmarks CPU/GPU
+Micro benchmarks CPU/GPU. Assembler code is based on the great work by Nemes: https://git.nemez.net/nemes/ipc-tests/-/tree/master. The code is not comparable because it was modified!
 
 ### Install Steps Netwide Assembler (NASM)
 
@@ -8,4 +8,4 @@ Micro benchmarks CPU/GPU
 * Create environment variable: Name=NASM, Variable Value=C:\Program Files\NASM
 
 ### To Do
-A detailed readme will follow soon. Add further FP tests. 
+A detailed readme will follow soon. Add further FP IPC tests. Add other micro benchmarks. Create a WPF UI.
