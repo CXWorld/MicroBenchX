@@ -5,13 +5,13 @@
 extern exit
 extern printf
 
-global mov_float64
+global mov_int64
 
 section .text
 
-mov_float64:
+mov_int64:
     push rbp
-	mov rax, ITERATIONS_mov_float64
+	mov rax, ITERATIONS_mov_int64
      mov rbx, __float64__(1.0)
     mov rcx, __float64__(2.0)
     mov rdx, __float64__(3.0)
@@ -44,7 +44,7 @@ mov_float64:
     lea rdi, [rel format]
 	pop rbp
 	xor rax, rax
-	mov rax, ITERATIONS_mov_float64
+	mov rax, ITERATIONS_mov_int64
     mov rsi, 14 ; 12 mov + 1 dec + 1 loop
 	mul rsi
     ret

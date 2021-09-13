@@ -13,20 +13,17 @@ extern "C" uint64_t add_avx256_int();
 extern "C" uint64_t add_avx512_float();
 extern "C" uint64_t add_avx512_int();
 extern "C" uint64_t add_int64();
-extern "C" uint64_t add_float64();
 extern "C" uint64_t add_sse128_float();
 extern "C" uint64_t add_sse128_int();
 extern "C" uint64_t and_int64();
 extern "C" uint64_t div_avx256_float();
 extern "C" uint64_t div_avx512_float();
 extern "C" uint64_t div_int64();
-extern "C" uint64_t div_float64();
 extern "C" uint64_t div_sse128_float();
 extern "C" uint64_t int_fp_mix();
 extern "C" uint64_t madd_avx256_float();
 extern "C" uint64_t madd_sse128_float();
 extern "C" uint64_t mov_int64();
-extern "C" uint64_t mov_float64();
 extern "C" uint64_t movdep_int64();
 extern "C" uint64_t movself_int64();
 extern "C" uint64_t mul_avx256_float();
@@ -34,7 +31,6 @@ extern "C" uint64_t mul_avx256_int();
 extern "C" uint64_t mul_avx512_float();
 extern "C" uint64_t mul_avx512_int();
 extern "C" uint64_t mul_int64();
-extern "C" uint64_t mul_float64();
 extern "C" uint64_t mul_sse128_float();
 extern "C" uint64_t mul_sse128_int();
 extern "C" uint64_t or_int64();
@@ -43,7 +39,6 @@ extern "C" uint64_t sub_avx256_int();
 extern "C" uint64_t sub_avx512_float();
 extern "C" uint64_t sub_avx512_int();
 extern "C" uint64_t sub_int64();
-extern "C" uint64_t sub_float64();
 extern "C" uint64_t sub_sse128_float();
 extern "C" uint64_t sub_sse128_int();
 extern "C" uint64_t xor_int64();
@@ -128,12 +123,6 @@ int main()
 	PrintIpcResults("Add Integer 64", add_int64_Iterations, time_diff_ms, clockSpeed_MHz);
 
 	ftime(&start);
-	uint64_t add_float64_Iterations = add_float64();
-	ftime(&end);
-	time_diff_ms = 1000 * (end.time - start.time) + (end.millitm - start.millitm);
-	PrintIpcResults("Add Float 64", add_float64_Iterations, time_diff_ms, clockSpeed_MHz);
-
-	ftime(&start);
 	uint64_t add_sse128_float_Iterations = add_sse128_float();
 	ftime(&end);
 	time_diff_ms = 1000 * (end.time - start.time) + (end.millitm - start.millitm);
@@ -182,12 +171,6 @@ int main()
 	PrintIpcResults("Div Integer 64", div_int64_Iterations, time_diff_ms, clockSpeed_MHz);
 
 	ftime(&start);
-	uint64_t div_float64_Iterations = div_float64();
-	ftime(&end);
-	time_diff_ms = 1000 * (end.time - start.time) + (end.millitm - start.millitm);
-	PrintIpcResults("Div Float 64", div_float64_Iterations, time_diff_ms, clockSpeed_MHz);
-
-	ftime(&start);
 	uint64_t div_sse128_float_Iterations = div_sse128_float();
 	ftime(&end);
 	time_diff_ms = 1000 * (end.time - start.time) + (end.millitm - start.millitm);
@@ -222,12 +205,6 @@ int main()
 	ftime(&end);
 	time_diff_ms = 1000 * (end.time - start.time) + (end.millitm - start.millitm);
 	PrintIpcResults("Copy Integer 64", mov_int64_Iterations, time_diff_ms, clockSpeed_MHz);
-
-	ftime(&start);
-	uint64_t mov_float64_Iterations = mov_float64();
-	ftime(&end);
-	time_diff_ms = 1000 * (end.time - start.time) + (end.millitm - start.millitm);
-	PrintIpcResults("Copy Float 64", mov_float64_Iterations, time_diff_ms, clockSpeed_MHz);
 
 	ftime(&start);
 	uint64_t movdep_int64_Iterations = movdep_int64();
@@ -294,12 +271,6 @@ int main()
 	ftime(&end);
 	time_diff_ms = 1000 * (end.time - start.time) + (end.millitm - start.millitm);
 	PrintIpcResults("Mul Integer 64", mul_int64_Iterations, time_diff_ms, clockSpeed_MHz);
-
-	ftime(&start);
-	uint64_t mul_float64_Iterations = mul_float64();
-	ftime(&end);
-	time_diff_ms = 1000 * (end.time - start.time) + (end.millitm - start.millitm);
-	PrintIpcResults("Mul Float 64", mul_float64_Iterations, time_diff_ms, clockSpeed_MHz);
 
 	ftime(&start);
 	uint64_t mul_sse128_float_Iterations = mul_sse128_float();
@@ -372,12 +343,6 @@ int main()
 	ftime(&end);
 	time_diff_ms = 1000 * (end.time - start.time) + (end.millitm - start.millitm);
 	PrintIpcResults("Sub Integer 64", sub_int64_Iterations, time_diff_ms, clockSpeed_MHz);
-
-	ftime(&start);
-	uint64_t sub_float64_Iterations = sub_float64();
-	ftime(&end);
-	time_diff_ms = 1000 * (end.time - start.time) + (end.millitm - start.millitm);
-	PrintIpcResults("Sub Float 64", sub_float64_Iterations, time_diff_ms, clockSpeed_MHz);
 
 	ftime(&start);
 	uint64_t sub_sse128_float_Iterations = sub_sse128_float();
