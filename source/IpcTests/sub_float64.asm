@@ -3,16 +3,15 @@
 %include "parameters.inc"
 
 extern exit
-extern printf
 
-global mov_float64
+global sub_float64
 
 section .text
 
-mov_float64:
+sub_float64:
     push rbp
-	mov rax, ITERATIONS_mov_float64
-     mov rbx, __float64__(1.0)
+	mov rax, ITERATIONS_sub_float64
+    mov rbx, __float64__(1.0)
     mov rcx, __float64__(2.0)
     mov rdx, __float64__(3.0)
     mov rsi, __float64__(4.0)
@@ -26,26 +25,27 @@ mov_float64:
     mov r14, __float64__(12.0)
     mov r15, __float64__(13.0)
 .loop:
-    mov rbx, rcx
-    mov rcx, rdx
-    mov rdx, rsi
-    mov rsi, rdi
-    mov rdi, r8
-    mov r8, r9
-    mov r9, r10
-    mov r10, r11
-    mov r11, r12
-    mov r12, r13
-    mov r13, r14
-    mov r14, r15
+    sub rbx, rbx
+    sub rcx, rcx
+    sub rdx, rdx
+    sub rsi, rsi
+    sub rdi, rdi
+    sub r8, r8
+    sub r9, r9
+    sub r10, r10
+    sub r11, r11
+    sub r12, r12
+    sub r13, r13
+    sub r14, r14
+    sub r15, r15
 	dec rax
 	jnz .loop
 .exit:
     lea rdi, [rel format]
 	pop rbp
 	xor rax, rax
-	mov rax, ITERATIONS_mov_float64
-    mov rsi, 14 ; 12 mov + 1 dec + 1 loop
+	mov rax, ITERATIONS_sub_float64
+    mov rsi, 15 ; 13 sub + 1 dec + 1 loop
 	mul rsi
     ret
 

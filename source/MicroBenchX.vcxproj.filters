@@ -134,6 +134,21 @@
     <NASM Include="IpcTests\zen_fpu_mix_22.asm">
       <Filter>Source Files\IpcTests</Filter>
     </NASM>
+    <NASM Include="IpcTests\add_float64.asm">
+      <Filter>Source Files\IpcTests</Filter>
+    </NASM>
+    <NASM Include="IpcTests\mov_float64.asm">
+      <Filter>Source Files\IpcTests</Filter>
+    </NASM>
+    <NASM Include="IpcTests\mul_float64.asm">
+      <Filter>Source Files\IpcTests</Filter>
+    </NASM>
+    <NASM Include="IpcTests\sub_float64.asm">
+      <Filter>Source Files\IpcTests</Filter>
+    </NASM>
+    <NASM Include="IpcTests\div_float64.asm">
+      <Filter>Source Files\IpcTests</Filter>
+    </NASM>
   </ItemGroup>
   <ItemGroup>
     <None Include="parameters.inc">
