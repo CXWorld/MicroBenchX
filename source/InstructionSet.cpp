@@ -5,6 +5,7 @@
 #include <array>
 #include <string>
 #include <intrin.h>
+#include <Windows.h>
 
 class InstructionSet
 {

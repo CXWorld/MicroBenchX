@@ -5,7 +5,9 @@
 #include <stdio.h>
 #include <string>
 #include<sys\timeb.h>
+#include<windows.h>
 #include "InstructionSet.cpp"
+#include "Hwinfo.cpp"
 
 // 36 tests
 extern "C" uint64_t add_avx256_float();
@@ -47,11 +49,16 @@ extern "C" uint64_t zen_fpu_mix_22();
 
 const InstructionSet::InstructionSet_Internal InstructionSet::CPU_Rep;
 
-void PrintIpcResults(const std::string testName, const uint64_t instructions,
+static void PrintIpcResults(const std::string testName, const uint64_t instructions,
 	const uint64_t time, const uint64_t clockSpeedMHz)
 {
 	double_t ipc = (double)instructions / ((double)clockSpeedMHz * 1000 * time);
 	printf("%-20s %-10.2f %-5.2f \n", testName.c_str(), (double)time / 1000, ipc);
+}
+
+static uint64_t Timestamp(void) {
+	unsigned int ui;
+	return __rdtscp(&ui);
 }
 
 int main()
@@ -59,9 +66,8 @@ int main()
 	std::cout << "MicroBenchX v1.0 - CPU IPC micro benchmarks \n\n";
 	std::cout << "[!] Set a fixed clock speed before running the test. [!]\n\n";
 	std::cout << InstructionSet::Brand().c_str() << "\n";
-	std::cout << "Please enter the CPU clock speed in MHz: ";
-	uint64_t clockSpeed_MHz;
-	std::cin >> clockSpeed_MHz;
+	uint64_t clockSpeed_MHz = Hwinfo::Frequency() / 1000000;
+	printf("%s: %llu", "Currrent frequency in MHz", clockSpeed_MHz);
 
 	printf("\n\n%-20s %-10s %-5s \n", "Test", "Time[s]", "IPC");
 
