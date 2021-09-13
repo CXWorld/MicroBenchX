@@ -56,13 +56,18 @@ static void PrintIpcResults(const std::string testName, const uint64_t instructi
 	printf("%-20s %-10.2f %-5.2f \n", testName.c_str(), (double)time / 1000, ipc);
 }
 
+static uint64_t Timestamp(void) {
+	unsigned int ui;
+	return __rdtscp(&ui);
+}
+
 int main()
 {
 	std::cout << "MicroBenchX v1.0 - CPU IPC micro benchmarks \n\n";
 	std::cout << "[!] Set a fixed clock speed before running the test. [!]\n\n";
 	std::cout << InstructionSet::Brand().c_str() << "\n";
 	uint64_t clockSpeed_MHz = Hwinfo::Frequency() / 1000000;
-	printf("%s: %llu", "Current frequency in MHz", clockSpeed_MHz);
+	printf("%s: %llu", "Currrent frequency in MHz", clockSpeed_MHz);
 
 	printf("\n\n%-20s %-10s %-5s \n", "Test", "Time[s]", "IPC");
 
