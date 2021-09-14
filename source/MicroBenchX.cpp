@@ -6,6 +6,7 @@
 #include <string>
 #include<sys\timeb.h>
 #include<windows.h>
+#include <conio.h>
 #include "InstructionSet.cpp"
 #include "Hwinfo.cpp"
 
@@ -375,4 +376,8 @@ int main()
 	ftime(&end);
 	time_diff_ms = 1000 * (end.time - start.time) + (end.millitm - start.millitm);
 	PrintIpcResults("Zen FPU Mix 22", zen_fpu_mix_22_Iterations, time_diff_ms, clockSpeed_MHz);
+
+	int ch;
+	printf("\nPress any key to exit...\n");
+	ch = _getch();
 }
