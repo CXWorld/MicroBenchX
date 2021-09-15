@@ -104,11 +104,11 @@ void PrintNotSupportedTest(TestData* data)
 void PrintAverageResults(TestData* data)
 {
 	printf("\n%-29s %-10.2f %-5.2f \n", "Average all tests w/o AVX512",
-		data->sum_time_Without_AVX512 / (data->count_IPC_Without_AVX512 * 1000), data->sum_IPC_Without_AVX512 / data->count_IPC_Without_AVX512);
+		data->sum_time_Without_AVX512 / ((double_t)data->count_IPC_Without_AVX512 * 1000), data->sum_IPC_Without_AVX512 / data->count_IPC_Without_AVX512);
 
 	if (InstructionSet::AVX512F()) {
 		printf("%-29s %-10.2f %-5.2f \n", "Average all tests w/ AVX512",
-			data->sum_time_All / (data->count_IPC_Without_AVX512 * 1000), data->sum_IPC_All / data->count_IPC_All);
+			data->sum_time_All / ((double_t)data->count_IPC_Without_AVX512 * 1000), data->sum_IPC_All / data->count_IPC_All);
 	}
 }
 
