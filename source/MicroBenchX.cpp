@@ -49,13 +49,67 @@ extern "C" uint64_t zen_fpu_mix_21();
 extern "C" uint64_t zen_fpu_mix_22();
 
 const InstructionSet::InstructionSet_Internal InstructionSet::CPU_Rep;
-uint64_t clockSpeed_MHz;
+uint64_t ClockSpeed_MHz;
 
-static void PrintIpcResults(const std::string testName, const uint64_t instructions,
-	const uint64_t time, uint64_t clockSpeedMHz)
+class TestData
 {
-	double_t ipc = ((double_t)instructions) / ((double_t)clockSpeedMHz * 1000.0L * (double_t)time);
-	printf("%-20s %-10.2f %-5.2f \n", testName.c_str(), (double_t)time / 1000.0L, ipc);
+public:
+	std::string testName;
+	uint64_t time;
+	uint64_t iterations;
+	double_t sum_IPC_All = 0;
+	double_t sum_IPC_Without_AVX512 = 0;
+	uint32_t count_IPC_All = 0;
+	uint32_t count_IPC_Without_AVX512 = 0;
+	double_t sum_time_All = 0;
+	double_t sum_time_Without_AVX512 = 0;
+	std::string step;
+	bool countAVX512;
+
+	void SetStep(bool decCount)
+	{
+		if (decCount)
+			count_IPC_All++;
+		std::string count = std::to_string(count_IPC_All);
+		step = count + "/" + std::to_string(36);
+	}
+};
+
+void ManageResults(TestData* data)
+{
+	uint64_t cyles = 1000llu * ClockSpeed_MHz * data->time;
+	double_t measured_Ipc = (double_t)data->iterations / cyles;
+
+	data->sum_IPC_All += measured_Ipc;
+	data->count_IPC_All++;
+	data->sum_time_All += (double_t)data->time;
+
+	if (!data->countAVX512)
+	{
+		data->sum_IPC_Without_AVX512 += measured_Ipc;
+		data->count_IPC_Without_AVX512++;
+		data->sum_time_Without_AVX512 += (double_t)data->time;
+	}
+
+	data->SetStep(false);
+	printf("%-8s %-20s %-10.2f %-5.2f \n", data->step.c_str(), data->testName.c_str(), (double_t)data->time / 1000.0L, measured_Ipc);
+}
+
+void PrintNotSupportedTest(TestData* data)
+{
+	data->SetStep(true);
+	printf("%-8s %-20s %-10s \n", data->step.c_str(), data->testName.c_str(), "not supported");
+}
+
+void PrintAverageResults(TestData* data)
+{
+	printf("\n%-29s %-10.2f %-5.2f \n", "Average all tests w/o AVX512",
+		data->sum_time_Without_AVX512 / (data->count_IPC_Without_AVX512 * 1000), data->sum_IPC_Without_AVX512 / data->count_IPC_Without_AVX512);
+
+	if (InstructionSet::AVX512F()) {
+		printf("%-29s %-10.2f %-5.2f \n", "Average all tests w/ AVX512",
+			data->sum_time_All / (data->count_IPC_Without_AVX512 * 1000), data->sum_IPC_All / data->count_IPC_All);
+	}
 }
 
 int main()
@@ -63,319 +117,396 @@ int main()
 	std::cout << "MicroBenchX v1.0 - CPU IPC micro benchmarks \n\n";
 	std::cout << "[!] Set a fixed clock speed before running the test. [!]\n\n";
 	std::cout << InstructionSet::Brand().c_str() << "\n";
-	clockSpeed_MHz = Hwinfo::Frequency() / 1000000;
-	printf("%s: %llu", "Current frequency in MHz", clockSpeed_MHz);
+	// clockSpeed_MHz = Hwinfo::Frequency() / 1000000;
+	printf("Enter current frequency in MHz: ");
+	std::cin >> ClockSpeed_MHz;
 
-	printf("\n\n%-20s %-10s %-5s \n", "Test", "Time[s]", "IPC");
+	printf("\n\n%-8s %-20s %-10s %-5s \n", "Step", "Test", "Time[s]", "IPC");
 
+	TestData data;
 	uint64_t time_diff_ms;
 	struct timeb start, end;
 
+	data.testName = "Add AVX256 Float";
 	if (InstructionSet::AVX())
 	{
 		ftime(&start);
-		uint64_t add_avx256_float_Iterations = add_avx256_float();
+		data.iterations = add_avx256_float();
 		ftime(&end);
-		time_diff_ms = 1000 * (end.time - start.time) + (end.millitm - start.millitm);
-		PrintIpcResults("Add AVX256 Float", add_avx256_float_Iterations, time_diff_ms, clockSpeed_MHz);
+		data.time = 1000 * (end.time - start.time) + (end.millitm - start.millitm);
+		data.countAVX512 = false;
+		ManageResults(&data);
+
 	}
 	else {
-		printf("%-20s %-10s \n", "Add AVX256 Float", "not supported");
+		PrintNotSupportedTest(&data);
 	}
 
+	data.testName = "Add AVX256 Integer";
 	if (InstructionSet::AVX())
 	{
 		ftime(&start);
-		uint64_t add_avx256_int_Iterations = add_avx256_int();
+		data.iterations = add_avx256_int();
 		ftime(&end);
-		time_diff_ms = 1000 * (end.time - start.time) + (end.millitm - start.millitm);
-		PrintIpcResults("Add AVX256 Integer", add_avx256_int_Iterations, time_diff_ms, clockSpeed_MHz);
+		data.time = 1000 * (end.time - start.time) + (end.millitm - start.millitm);
+		data.countAVX512 = false;
+		ManageResults(&data);
 	}
 	else {
-		printf("%-20s %-10s \n", "Add AVX256 Integer", "not supported");
+		PrintNotSupportedTest(&data);
 	}
 
+	data.testName = "Add AVX512 Float";
 	if (InstructionSet::AVX512F())
 	{
 		ftime(&start);
-		uint64_t add_avx512_float_Iterations = add_avx512_float();
+		data.iterations = add_avx512_float();
 		ftime(&end);
-		time_diff_ms = 1000 * (end.time - start.time) + (end.millitm - start.millitm);
-		PrintIpcResults("Add AVX512 Float", add_avx512_float_Iterations, time_diff_ms, clockSpeed_MHz);
+		data.time = 1000 * (end.time - start.time) + (end.millitm - start.millitm);
+		data.countAVX512 = true;
+		ManageResults(&data);
 	}
 	else {
-		printf("%-20s %-10s \n", "Add AVX512 Float", "not supported");
+		PrintNotSupportedTest(&data);
 	}
 
+	data.testName = "Add AVX512 Integer";
 	if (InstructionSet::AVX512F())
 	{
 		ftime(&start);
-		uint64_t add_avx512_int_Iterations = add_avx512_int();
+		data.iterations = add_avx512_int();
 		ftime(&end);
-		time_diff_ms = 1000 * (end.time - start.time) + (end.millitm - start.millitm);
-		PrintIpcResults("Add AVX512 Integer", add_avx512_int_Iterations, time_diff_ms, clockSpeed_MHz);
+		data.time = 1000 * (end.time - start.time) + (end.millitm - start.millitm);
+		data.countAVX512 = true;
+		ManageResults(&data);
 	}
 	else {
-		printf("%-20s %-10s \n", "Add AVX512 Integer", "not supported");
+		PrintNotSupportedTest(&data);
 	}
 
+	data.testName = "Add Integer 64";
 	ftime(&start);
-	uint64_t add_int64_Iterations = add_int64();
+	data.iterations = add_int64();
 	ftime(&end);
-	time_diff_ms = 1000 * (end.time - start.time) + (end.millitm - start.millitm);
-	PrintIpcResults("Add Integer 64", add_int64_Iterations, time_diff_ms, clockSpeed_MHz);
+	data.time = 1000 * (end.time - start.time) + (end.millitm - start.millitm);
+	data.countAVX512 = false;
+	ManageResults(&data);
 
+	data.testName = "Add SSE128 Float";
 	ftime(&start);
-	uint64_t add_sse128_float_Iterations = add_sse128_float();
+	data.iterations = add_sse128_float();
 	ftime(&end);
-	time_diff_ms = 1000 * (end.time - start.time) + (end.millitm - start.millitm);
-	PrintIpcResults("Add SSE128 Float", add_sse128_float_Iterations, time_diff_ms, clockSpeed_MHz);
+	data.time = 1000 * (end.time - start.time) + (end.millitm - start.millitm);
+	data.countAVX512 = false;
+	ManageResults(&data);
 
+	data.testName = "Add SSE128 Integer";
 	ftime(&start);
-	uint64_t add_sse128_int_Iterations = add_sse128_int();
+	data.iterations = add_sse128_int();
 	ftime(&end);
-	time_diff_ms = 1000 * (end.time - start.time) + (end.millitm - start.millitm);
-	PrintIpcResults("Add SSE128 Integer", add_sse128_int_Iterations, time_diff_ms, clockSpeed_MHz);
+	data.time = 1000 * (end.time - start.time) + (end.millitm - start.millitm);
+	data.countAVX512 = false;
+	ManageResults(&data);
 
+	data.testName = "And Integer 64";
 	ftime(&start);
-	uint64_t and_int64_Iterations = and_int64();
+	data.iterations = and_int64();
 	ftime(&end);
-	time_diff_ms = 1000 * (end.time - start.time) + (end.millitm - start.millitm);
-	PrintIpcResults("And Integer 64", and_int64_Iterations, time_diff_ms, clockSpeed_MHz);
+	data.time = 1000 * (end.time - start.time) + (end.millitm - start.millitm);
+	data.countAVX512 = false;
+	ManageResults(&data);
 
+	data.testName = "Div AVX256 Float";
 	if (InstructionSet::AVX())
 	{
 		ftime(&start);
-		uint64_t div_avx256_float_Iterations = div_avx256_float();
+		data.iterations = div_avx256_float();
 		ftime(&end);
-		time_diff_ms = 1000 * (end.time - start.time) + (end.millitm - start.millitm);
-		PrintIpcResults("Div AVX256 Float", div_avx256_float_Iterations, time_diff_ms, clockSpeed_MHz);
+		data.time = 1000 * (end.time - start.time) + (end.millitm - start.millitm);
+		data.countAVX512 = false;
+		ManageResults(&data);
 	}
 	else {
-		printf("%-20s %-10s \n", "Div AVX256 Float", "not supported");
+		PrintNotSupportedTest(&data);
 	}
 
+	data.testName = "Div AVX512 Float";
 	if (InstructionSet::AVX512F())
 	{
 		ftime(&start);
-		uint64_t div_avx512_float_Iterations = div_avx512_float();
+		data.iterations = div_avx512_float();
 		ftime(&end);
-		time_diff_ms = 1000 * (end.time - start.time) + (end.millitm - start.millitm);
-		PrintIpcResults("Div AVX512 Float", div_avx512_float_Iterations, time_diff_ms, clockSpeed_MHz);
+		data.time = 1000 * (end.time - start.time) + (end.millitm - start.millitm);
+		data.countAVX512 = true;
+		ManageResults(&data);
 	}
 	else {
-		printf("%-20s %-10s \n", "Div AVX512 Float", "not supported");
+		PrintNotSupportedTest(&data);
 	}
 
+	data.testName = "Div Integer 64";
 	ftime(&start);
-	uint64_t div_int64_Iterations = div_int64();
+	data.iterations = div_int64();
 	ftime(&end);
-	time_diff_ms = 1000 * (end.time - start.time) + (end.millitm - start.millitm);
-	PrintIpcResults("Div Integer 64", div_int64_Iterations, time_diff_ms, clockSpeed_MHz);
+	data.time = 1000 * (end.time - start.time) + (end.millitm - start.millitm);
+	data.countAVX512 = false;
+	ManageResults(&data);
 
+	data.testName = "Div SSE128 Float";
 	ftime(&start);
-	uint64_t div_sse128_float_Iterations = div_sse128_float();
+	data.iterations = div_sse128_float();
 	ftime(&end);
-	time_diff_ms = 1000 * (end.time - start.time) + (end.millitm - start.millitm);
-	PrintIpcResults("Div SSE128 Float", div_sse128_float_Iterations, time_diff_ms, clockSpeed_MHz);
+	data.time = 1000 * (end.time - start.time) + (end.millitm - start.millitm);
+	data.countAVX512 = false;
+	ManageResults(&data);
 
+	data.testName = "Mix Integer Float";
 	ftime(&start);
-	uint64_t int_fp_mix_Iterations = int_fp_mix();
+	data.iterations = int_fp_mix();
 	ftime(&end);
-	time_diff_ms = 1000 * (end.time - start.time) + (end.millitm - start.millitm);
-	PrintIpcResults("Mix Integer Float", int_fp_mix_Iterations, time_diff_ms, clockSpeed_MHz);
+	data.time = 1000 * (end.time - start.time) + (end.millitm - start.millitm);
+	data.countAVX512 = false;
+	ManageResults(&data);
 
+	data.testName = "Madd AVX256 Float";
 	if (InstructionSet::AVX())
 	{
 		ftime(&start);
-		uint64_t madd_avx256_float_Iterations = madd_avx256_float();
+		data.iterations = madd_avx256_float();
 		ftime(&end);
-		time_diff_ms = 1000 * (end.time - start.time) + (end.millitm - start.millitm);
-		PrintIpcResults("Madd AVX256 Float", madd_avx256_float_Iterations, time_diff_ms, clockSpeed_MHz);
+		data.time = 1000 * (end.time - start.time) + (end.millitm - start.millitm);
+		data.countAVX512 = false;
+		ManageResults(&data);
 	}
 	else {
-		printf("%-20s %-10s \n", "Madd AVX256 Float", "not supported");
+		PrintNotSupportedTest(&data);
 	}
 
+	data.testName = "Madd SSE128 Float";
 	ftime(&start);
-	uint64_t madd_sse128_float_Iterations = madd_sse128_float();
+	data.iterations = madd_sse128_float();
 	ftime(&end);
-	time_diff_ms = 1000 * (end.time - start.time) + (end.millitm - start.millitm);
-	PrintIpcResults("Madd SSE128 Float", madd_sse128_float_Iterations, time_diff_ms, clockSpeed_MHz);
+	data.time = 1000 * (end.time - start.time) + (end.millitm - start.millitm);
+	data.countAVX512 = false;
+	ManageResults(&data);
 
+	data.testName = "Copy Integer 64";
 	ftime(&start);
-	uint64_t mov_int64_Iterations = mov_int64();
+	data.iterations = mov_int64();
 	ftime(&end);
-	time_diff_ms = 1000 * (end.time - start.time) + (end.millitm - start.millitm);
-	PrintIpcResults("Copy Integer 64", mov_int64_Iterations, time_diff_ms, clockSpeed_MHz);
+	data.time = 1000 * (end.time - start.time) + (end.millitm - start.millitm);
+	data.countAVX512 = false;
+	ManageResults(&data);
 
+	data.testName = "Copy Dep Integer 64";
 	ftime(&start);
-	uint64_t movdep_int64_Iterations = movdep_int64();
+	data.iterations = movdep_int64();
 	ftime(&end);
-	time_diff_ms = 1000 * (end.time - start.time) + (end.millitm - start.millitm);
-	PrintIpcResults("Copy Deep Integer 64", movdep_int64_Iterations, time_diff_ms, clockSpeed_MHz);
+	data.time = 1000 * (end.time - start.time) + (end.millitm - start.millitm);
+	data.countAVX512 = false;
+	ManageResults(&data);
 
+	data.testName = "Copy Self Integer 64";
 	ftime(&start);
-	uint64_t movself_int64_Iterations = movself_int64();
+	data.iterations = movself_int64();
 	ftime(&end);
-	time_diff_ms = 1000 * (end.time - start.time) + (end.millitm - start.millitm);
-	PrintIpcResults("Copy Self Integer 64", movself_int64_Iterations, time_diff_ms, clockSpeed_MHz);
+	data.time = 1000 * (end.time - start.time) + (end.millitm - start.millitm);
+	data.countAVX512 = false;
+	ManageResults(&data);
 
+	data.testName = "Mul AVX256 Float";
 	if (InstructionSet::AVX())
 	{
 		ftime(&start);
-		uint64_t mul_avx256_float_Iterations = mul_avx256_float();
+		data.iterations = mul_avx256_float();
 		ftime(&end);
-		time_diff_ms = 1000 * (end.time - start.time) + (end.millitm - start.millitm);
-		PrintIpcResults("Mul AVX256 Float", mul_avx256_float_Iterations, time_diff_ms, clockSpeed_MHz);
+		data.time = 1000 * (end.time - start.time) + (end.millitm - start.millitm);
+		data.countAVX512 = false;
+		ManageResults(&data);
 	}
 	else {
-		printf("%-20s %-10s \n", "Mul AVX256 Float", "not supported");
+		PrintNotSupportedTest(&data);
 	}
 
+	data.testName = "Mul AVX256 Integer";
 	if (InstructionSet::AVX())
 	{
 		ftime(&start);
-		uint64_t mul_avx256_int_Iterations = mul_avx256_int();
+		data.iterations = mul_avx256_int();
 		ftime(&end);
-		time_diff_ms = 1000 * (end.time - start.time) + (end.millitm - start.millitm);
-		PrintIpcResults("Mul AVX256 Integer", mul_avx256_int_Iterations, time_diff_ms, clockSpeed_MHz);
+		data.time = 1000 * (end.time - start.time) + (end.millitm - start.millitm);
+		data.countAVX512 = false;
+		ManageResults(&data);
 	}
 	else {
-		printf("%-20s %-10s \n", "Mul AVX256 Integer", "not supported");
+		PrintNotSupportedTest(&data);
 	}
 
+	data.testName = "Mul AVX512 Float";
 	if (InstructionSet::AVX512F())
 	{
 		ftime(&start);
-		uint64_t mul_avx512_float_Iterations = mul_avx512_float();
+		data.iterations = mul_avx512_float();
 		ftime(&end);
-		time_diff_ms = 1000 * (end.time - start.time) + (end.millitm - start.millitm);
-		PrintIpcResults("Mul AVX512 Float", mul_avx512_float_Iterations, time_diff_ms, clockSpeed_MHz);
+		data.time = 1000 * (end.time - start.time) + (end.millitm - start.millitm);
+		data.countAVX512 = true;
+		ManageResults(&data);
 	}
 	else {
-		printf("%-20s %-10s \n", "Mul AVX512 Float", "not supported");
+		PrintNotSupportedTest(&data);
 	}
 
+	data.testName = "Mul AVX512 Integer";
 	if (InstructionSet::AVX512F())
 	{
 		ftime(&start);
-		uint64_t mul_avx512_int_Iterations = mul_avx512_int();
+		data.iterations = mul_avx512_int();
 		ftime(&end);
-		time_diff_ms = 1000 * (end.time - start.time) + (end.millitm - start.millitm);
-		PrintIpcResults("Mul AVX512 Integer", mul_avx512_int_Iterations, time_diff_ms, clockSpeed_MHz);
+		data.time = 1000 * (end.time - start.time) + (end.millitm - start.millitm);
+		data.countAVX512 = true;
+		ManageResults(&data);
 	}
 	else {
-		printf("%-20s %-10s \n", "Mul AVX512 Integer", "not supported");
+		PrintNotSupportedTest(&data);
 	}
 
+	data.testName = "Mul Integer 64";
 	ftime(&start);
-	uint64_t mul_int64_Iterations = mul_int64();
+	data.iterations = mul_int64();
 	ftime(&end);
-	time_diff_ms = 1000 * (end.time - start.time) + (end.millitm - start.millitm);
-	PrintIpcResults("Mul Integer 64", mul_int64_Iterations, time_diff_ms, clockSpeed_MHz);
+	data.time = 1000 * (end.time - start.time) + (end.millitm - start.millitm);
+	data.countAVX512 = false;
+	ManageResults(&data);
 
+	data.testName = "Mul SSE128 Float";
 	ftime(&start);
-	uint64_t mul_sse128_float_Iterations = mul_sse128_float();
+	data.iterations = mul_sse128_float();
 	ftime(&end);
-	time_diff_ms = 1000 * (end.time - start.time) + (end.millitm - start.millitm);
-	PrintIpcResults("Mul SSE128 Float", mul_sse128_float_Iterations, time_diff_ms, clockSpeed_MHz);
+	data.time = 1000 * (end.time - start.time) + (end.millitm - start.millitm);
+	data.countAVX512 = false;
+	ManageResults(&data);
 
+	data.testName = "Mul SSE128 Integer";
 	ftime(&start);
-	uint64_t mul_sse128_int_Iterations = mul_sse128_int();
+	data.iterations = mul_sse128_int();
 	ftime(&end);
-	time_diff_ms = 1000 * (end.time - start.time) + (end.millitm - start.millitm);
-	PrintIpcResults("Mul SSE128 Integer", mul_sse128_int_Iterations, time_diff_ms, clockSpeed_MHz);
+	data.time = 1000 * (end.time - start.time) + (end.millitm - start.millitm);
+	data.countAVX512 = false;
+	ManageResults(&data);
 
+	data.testName = "Or Integer 64";
 	ftime(&start);
-	uint64_t or_int64_Iterations = or_int64();
+	data.iterations = or_int64();
 	ftime(&end);
-	time_diff_ms = 1000 * (end.time - start.time) + (end.millitm - start.millitm);
-	PrintIpcResults("Or Integer 64", or_int64_Iterations, time_diff_ms, clockSpeed_MHz);
+	data.time = 1000 * (end.time - start.time) + (end.millitm - start.millitm);
+	data.countAVX512 = false;
+	ManageResults(&data);
 
+	data.testName = "Sub AVX256 Float";
 	if (InstructionSet::AVX())
 	{
 		ftime(&start);
-		uint64_t sub_avx256_float_Iterations = sub_avx256_float();
+		data.iterations = sub_avx256_float();
 		ftime(&end);
-		time_diff_ms = 1000 * (end.time - start.time) + (end.millitm - start.millitm);
-		PrintIpcResults("Sub AVX256 Float", sub_avx256_float_Iterations, time_diff_ms, clockSpeed_MHz);
+		data.time = 1000 * (end.time - start.time) + (end.millitm - start.millitm);
+		data.countAVX512 = false;
+		ManageResults(&data);
 	}
 	else {
-		printf("%-20s %-10s \n", "Sub AVX256 Float", "not supported");
+		PrintNotSupportedTest(&data);
 	}
 
+	data.testName = "Sub AVX256 Integer";
 	if (InstructionSet::AVX())
 	{
 		ftime(&start);
-		uint64_t sub_avx256_int_Iterations = sub_avx256_int();
+		data.iterations = sub_avx256_int();
 		ftime(&end);
-		time_diff_ms = 1000 * (end.time - start.time) + (end.millitm - start.millitm);
-		PrintIpcResults("Sub AVX256 Integer", sub_avx256_int_Iterations, time_diff_ms, clockSpeed_MHz);
+		data.time = 1000 * (end.time - start.time) + (end.millitm - start.millitm);
+		data.countAVX512 = false;
+		ManageResults(&data);
 	}
 	else {
-		printf("%-20s %-10s \n", "Sub AVX256 Integer", "not supported");
+		PrintNotSupportedTest(&data);
 	}
 
+	data.testName = "Sub AVX512 Float";
 	if (InstructionSet::AVX512F())
 	{
 		ftime(&start);
-		uint64_t sub_avx512_float_Iterations = sub_avx512_float();
+		data.iterations = sub_avx512_float();
 		ftime(&end);
-		time_diff_ms = 1000 * (end.time - start.time) + (end.millitm - start.millitm);
-		PrintIpcResults("Sub AVX512 Float", sub_avx512_float_Iterations, time_diff_ms, clockSpeed_MHz);
+		data.time = 1000 * (end.time - start.time) + (end.millitm - start.millitm);
+		data.countAVX512 = true;
+		ManageResults(&data);
 	}
 	else {
-		printf("%-20s %-10s \n", "Sub AVX512 Float", "not supported");
+		PrintNotSupportedTest(&data);
 	}
 
+	data.testName = "Sub AVX512 Integer";
 	if (InstructionSet::AVX512F())
 	{
 		ftime(&start);
-		uint64_t sub_avx512_int_Iterations = sub_avx512_int();
+		data.iterations = sub_avx512_int();
 		ftime(&end);
-		time_diff_ms = 1000 * (end.time - start.time) + (end.millitm - start.millitm);
-		PrintIpcResults("Sub AVX512 Integer", sub_avx512_int_Iterations, time_diff_ms, clockSpeed_MHz);
+		data.time = 1000 * (end.time - start.time) + (end.millitm - start.millitm);
+		data.countAVX512 = true;
+		ManageResults(&data);
 	}
 	else {
-		printf("%-20s %-10s \n", "Sub AVX512 Integer", "not supported");
+		PrintNotSupportedTest(&data);
 	}
 
+	data.testName = "Sub Integer 64";
 	ftime(&start);
-	uint64_t sub_int64_Iterations = sub_int64();
+	data.iterations = sub_int64();
 	ftime(&end);
-	time_diff_ms = 1000 * (end.time - start.time) + (end.millitm - start.millitm);
-	PrintIpcResults("Sub Integer 64", sub_int64_Iterations, time_diff_ms, clockSpeed_MHz);
+	data.time = 1000 * (end.time - start.time) + (end.millitm - start.millitm);
+	data.countAVX512 = false;
+	ManageResults(&data);
 
+	data.testName = "Sub SSE128 Float";
 	ftime(&start);
-	uint64_t sub_sse128_float_Iterations = sub_sse128_float();
+	data.iterations = sub_sse128_float();
 	ftime(&end);
-	time_diff_ms = 1000 * (end.time - start.time) + (end.millitm - start.millitm);
-	PrintIpcResults("Sub SSE128 Float", sub_sse128_float_Iterations, time_diff_ms, clockSpeed_MHz);
+	data.time = 1000 * (end.time - start.time) + (end.millitm - start.millitm);
+	data.countAVX512 = false;
+	ManageResults(&data);
 
+	data.testName = "Sub SSE128 Integer";
 	ftime(&start);
-	uint64_t sub_sse128_int_Iterations = sub_sse128_int();
+	data.iterations = sub_sse128_int();
 	ftime(&end);
-	time_diff_ms = 1000 * (end.time - start.time) + (end.millitm - start.millitm);
-	PrintIpcResults("Sub SSE128 Integer", sub_sse128_int_Iterations, time_diff_ms, clockSpeed_MHz);
+	data.time = 1000 * (end.time - start.time) + (end.millitm - start.millitm);
+	data.countAVX512 = false;
+	ManageResults(&data);
 
+	data.testName = "Xor Integer 64";
 	ftime(&start);
-	uint64_t xor_int64_Iterations = xor_int64();
+	data.iterations = xor_int64();
 	ftime(&end);
-	time_diff_ms = 1000 * (end.time - start.time) + (end.millitm - start.millitm);
-	PrintIpcResults("Xor Integer 64", xor_int64_Iterations, time_diff_ms, clockSpeed_MHz);
+	data.time = 1000 * (end.time - start.time) + (end.millitm - start.millitm);
+	data.countAVX512 = false;
+	ManageResults(&data);
 
+	data.testName = "Zen FPU Mix 21";
 	ftime(&start);
-	uint64_t zen_fpu_mix_21_Iterations = zen_fpu_mix_21();
+	data.iterations = zen_fpu_mix_21();
 	ftime(&end);
-	time_diff_ms = 1000 * (end.time - start.time) + (end.millitm - start.millitm);
-	PrintIpcResults("Zen FPU Mix 21", zen_fpu_mix_21_Iterations, time_diff_ms, clockSpeed_MHz);
+	data.time = 1000 * (end.time - start.time) + (end.millitm - start.millitm);
+	data.countAVX512 = false;
+	ManageResults(&data);
 
+	data.testName = "Zen FPU Mix 22";
 	ftime(&start);
-	uint64_t zen_fpu_mix_22_Iterations = zen_fpu_mix_22();
+	data.iterations = zen_fpu_mix_22();
 	ftime(&end);
-	time_diff_ms = 1000 * (end.time - start.time) + (end.millitm - start.millitm);
-	PrintIpcResults("Zen FPU Mix 22", zen_fpu_mix_22_Iterations, time_diff_ms, clockSpeed_MHz);
+	data.time = 1000 * (end.time - start.time) + (end.millitm - start.millitm);
+	data.countAVX512 = false;
+	ManageResults(&data);
+
+	PrintAverageResults(&data);
 
 	int ch;
 	printf("\nPress any key to exit...\n");
