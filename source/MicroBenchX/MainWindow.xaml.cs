@@ -35,48 +35,50 @@ namespace MicroBenchX
         [DllImport("kernel32.dll")]
         static extern int GetCurrentProcessorNumber();
 
+        static int TimerDuration = 2000;
+
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             // Random memory access
-            //Task.Factory.StartNew(async () =>
-            //{
-            //    // 1GB: 1048576 
-            //    // 512MB: 524288
-            //    // 256MB: 262144
-            //    // 128MB: 131072
-            //    const int listSize = 524288 * 1024 / sizeof(double);
-            //    var dataArray = new double[listSize];
+            Task.Factory.StartNew(async () =>
+            {
+                // 1GB: 1048576 
+                // 512MB: 524288
+                // 256MB: 262144
+                // 128MB: 131072
+                const int listSize = 524288 * 1024 / sizeof(double);
+                var dataArray = new double[listSize];
 
-            //    var gaussianRandom = new GaussianRandom();
+                var gaussianRandom = new GaussianRandom();
 
-            //    for (int i = 0; i < listSize; i++)
-            //    {
-            //        dataArray[i] = gaussianRandom.GetNext();
-            //    }
+                for (int i = 0; i < listSize; i++)
+                {
+                    dataArray[i] = gaussianRandom.GetNext();
+                }
 
-            //    bool doUpdateStatus = false;
+                bool doUpdateStatus = false;
 
-            //    // Create a timer with a two second interval.
-            //    var aTimer = new System.Timers.Timer(2000);
-            //    // Hook up the Elapsed event for the timer. 
-            //    aTimer.Elapsed += (o, e) => doUpdateStatus = true;
-            //    aTimer.AutoReset = true;
-            //    aTimer.Enabled = true;
+                // Create a timer with a two second interval.
+                var aTimer = new System.Timers.Timer(TimerDuration);
+                // Hook up the Elapsed event for the timer. 
+                aTimer.Elapsed += (o, e) => doUpdateStatus = true;
+                aTimer.AutoReset = true;
+                aTimer.Enabled = true;
 
-            //    do
-            //    {
-            //        var maxVal = DoRandomMemoryAccess(dataArray);
-            //        Debug.WriteLine($"Max value is {Math.Round(maxVal, 4)}");
-            //        await Task.Delay(1);
+                do
+                {
+                    var maxVal = DoRandomMemoryAccess(dataArray);
+                    await Task.Delay(1);
 
-            //        if (doUpdateStatus)
-            //        {
-            //            Debug.WriteLine($"Task is running on core #{GetCurrentProcessorNumber()}");
-            //            doUpdateStatus = false;
-            //        }
+                    if (doUpdateStatus)
+                    {
+                        Debug.WriteLine($"Task is running on core #{GetCurrentProcessorNumber()}");
+                        Debug.WriteLine($"Max value is {Math.Round(maxVal, 4)}");
+                        doUpdateStatus = false;
+                    }
 
-            //    } while (true);
-            //});
+                } while (true);
+            });
 
             // Random memory access
             Task.Factory.StartNew(async () =>
@@ -84,7 +86,7 @@ namespace MicroBenchX
                 bool doUpdateStatus = false;
 
                 // Create a timer with a two second interval.
-                var aTimer = new System.Timers.Timer(2000);
+                var aTimer = new System.Timers.Timer(TimerDuration);
                 // Hook up the Elapsed event for the timer. 
                 aTimer.Elapsed += (o, e) => doUpdateStatus = true;
                 aTimer.AutoReset = true;
@@ -93,16 +95,60 @@ namespace MicroBenchX
                 do
                 {
                     var milliseconds = DoDeviceBandwidthTest();
-                    Debug.WriteLine($"{milliseconds} ms runtime");
                     await Task.Delay(1);
 
                     if (doUpdateStatus)
                     {
                         Debug.WriteLine($"Task is running on core #{GetCurrentProcessorNumber()}");
+                        Debug.WriteLine($"{milliseconds} ms runtime");
                         doUpdateStatus = false;
                     }
 
                 } while (true);
+            });
+
+            // Heay arithmetic
+            Task.Factory.StartNew(() =>
+            {
+                bool doUpdateStatus = false;
+
+                // Create a timer with a two second interval.
+                var aTimer = new System.Timers.Timer(TimerDuration);
+                // Hook up the Elapsed event for the timer. 
+                aTimer.Elapsed += (o, e) => doUpdateStatus = true;
+                aTimer.AutoReset = true;
+                aTimer.Enabled = true;
+
+                // Generate 256kb test data
+                const long length = 262144;
+                const long size = length / sizeof(long);
+                long[] array = Enumerable.Range(1, (int)size).Select(x => (long)x).ToArray();
+
+                try
+                {
+                    do
+                    {
+                        long dotProduct = array.Sum(x => x * x);
+
+                        // https://www.wolframalpha.com/input/?i=sum(i%5E2,i%3D1..n)
+                        if (dotProduct != (size * (size + 1) * (2 * size + 1)) / 6)
+                        {
+                            throw new InvalidOperationException();
+                        }
+
+                        if (doUpdateStatus)
+                        {
+                            Debug.WriteLine($"Task is running on core #{GetCurrentProcessorNumber()}");
+                            Debug.WriteLine($"Result of dot product is {dotProduct}");
+                            doUpdateStatus = false;
+                        }
+
+                    } while (true);
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
             });
         }
 
@@ -162,7 +208,7 @@ namespace MicroBenchX
                 }
                 sWriter.Close();
 
-                File.Copy(path, pathCopy);              
+                File.Copy(path, pathCopy);
                 File.Delete(path);
                 File.Delete(pathCopy);
             }
