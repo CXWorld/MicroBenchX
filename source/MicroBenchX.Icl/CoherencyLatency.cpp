@@ -3,6 +3,8 @@
 #include <sys\timeb.h>
 #include <intrin.h>
 #include <windows.h>
+#include <iostream>
+#include <conio.h>
 
 #define ITERATIONS 10000000;
 
@@ -29,27 +31,29 @@ int main(int argc, char *argv[]) {
     GetSystemInfo(&sysInfo);
     numProcs = sysInfo.dwNumberOfProcessors;
     fprintf(stderr, "Number of CPUs: %u\n", numProcs);
-    printf("Press any key to start the test:");
 
+    int ch;
+    printf("\nPress any key to start the test:");
+    ch = _getch();
 
     latencies = (float *)malloc(sizeof(float) * numProcs * numProcs);
     if (latencies == NULL) {
-        fprintf(stderr, "couldn't allocate result array\n");
+        fprintf(stderr, "\ncouldn't allocate result array\n");
         return 0;
     }
 
     if (argc > 1) {
         iter = atol(argv[1]);
-        fprintf(stderr, "%lu iterations requested\n", iter);
+        fprintf(stderr, "\n%lu iterations requested\n", iter);
     }
     else {
-        fprintf(stderr, "Usage: coherencylatency.exe [iterations] [bounce/owned]\n");
+        fprintf(stderr, "\nUsage: MicroBenchX.C2CLatency.exe [iterations] [bounce/owned]\n");
     }
 
     if (argc > 2) {
         if (strncmp(argv[2], "owned", 5) == 0) {
             test = RunOwnedTest;
-            fprintf(stderr, "Using separate cache lines for each thread to write to\n");
+            fprintf(stderr, "\nUsing separate cache lines for each thread to write to\n");
         }
     }
 
@@ -70,6 +74,9 @@ int main(int argc, char *argv[]) {
         }
         printf("\n");
     }
+
+    printf("\nPress any key to close the app");
+    ch = _getch();
     
     free(latencies);
     return 0;
