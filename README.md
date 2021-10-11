@@ -13,6 +13,8 @@ Measuring inter-core latencies based on Clammicrobench: https://github.com/clamc
 
 It is recommended to set a high priority for the process in the task manager. Close all other applications.
 
+Creating a latency heat map on our website: https://www.capframex.com/assets/static/latency-heatmap.html
+
 ### Frameworks and Packages
 * Microsoft Visual C++ Redistributable for Visual Studio: https://bit.ly/3tIQqFh
 
