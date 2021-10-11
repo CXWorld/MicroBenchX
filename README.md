@@ -8,6 +8,11 @@ These tests do not represent the real world performance of a CPU. In practice th
 
 It is very important to set a fixed clock speed for the IPC tests. Disable all turbos, sleep states and AVX offsets. Set "High performance" power plan.
 
+### Core-to-Core Latency Test
+Measuring inter-core latencies based on Clammicrobench: https://github.com/clamchowder/Microbenchmarks/tree/master/CoherencyLatency
+
+It is recommended to set a high priority for the process in the task manager. Close all other applications.
+
 ### Frameworks and Packages
 * Microsoft Visual C++ Redistributable for Visual Studio: https://bit.ly/3tIQqFh
 
