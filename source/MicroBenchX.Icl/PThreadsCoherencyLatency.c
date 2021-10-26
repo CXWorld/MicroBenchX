@@ -11,7 +11,7 @@
 #include <sched.h>
 #include <pthread.h>
 
-#define ITERATIONS 10000000;
+#define ITERATIONS 1000000;
 
 // kidding right?
 #define gettid() syscall(SYS_gettid)
