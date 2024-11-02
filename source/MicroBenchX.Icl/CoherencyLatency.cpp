@@ -4,10 +4,15 @@
 #include <intrin.h>
 #include <windows.h>
 #include <iostream>
+#include <fstream>
+#include <vector>
+#include <ctime>
+#include <sstream>
+#include <iomanip>
 #include <conio.h>
 
-#define ITERATIONS 1000000/*1000000*/;
-#define RUNS 10;
+#define ITERATIONS 1000000;/*1000000*/
+#define RUNS 10;/*10*/
 
 float RunTest(unsigned int processor1, unsigned int processor2, uint64_t iter);
 float RunOwnedTest(unsigned int processor1, unsigned int processor2, uint64_t iter);
@@ -124,6 +129,54 @@ int main(int argc, char* argv[]) {
 		}
 		printf("\n");
 	}
+
+	// Get the current time and format it as a timestamp
+	std::time_t now = std::time(nullptr);
+	std::tm localTime;
+	if (localtime_s(&localTime, &now) != 0) {
+		std::cerr << "Failed to get local time." << std::endl;
+		return 1;
+	}
+
+	std::ostringstream filenameStream;
+	filenameStream << "core_latencies_"
+		<< std::put_time(&localTime, "%Y%m%d_%H%M%S")
+		<< ".csv";
+	std::string filename = filenameStream.str();
+
+	// Open file stream for writing
+	std::ofstream outFile(filename);
+
+	if (!outFile.is_open()) {
+		std::cerr << "Failed to open file for writing." << std::endl;
+		return 1;
+	}
+
+	// Write header row with "Core 0", "Core 1", etc.
+	outFile << ";";
+	for (DWORD i = 0; i < numProcs; i++) {
+		if (i != 0) outFile << ";";
+		outFile << "Core " << i;
+	}
+	outFile << "\n";
+
+	// Write latency values row by row
+	for (DWORD i = 0; i < numProcs; i++) {
+		// Start each row with "Core i", except for the first row which is blank
+		outFile << "Core " << i << ";";
+
+		for (DWORD j = 0; j < numProcs; j++) {
+			if (j != 0) outFile << ";";
+			if (j == i) outFile << "x"; // Diagonal elements labeled "x"
+			else outFile << latenciesFiltered[j + i * numProcs];
+		}
+		outFile << "\n";
+	}
+
+	// Close the file stream
+	outFile.close();
+
+	std::cout << "Latencies written to " << filename << std::endl;
 
 	printf("\nPress any key to close the app");
 	ch = _getch();
