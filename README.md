@@ -21,7 +21,7 @@ Creating a latency heatmap on our website: https://www.capframex.com/assets/stat
 ### Install Steps Netwide Assembler (NASM)
 * Download installer: https://www.nasm.us/
 * Download VSNASM batch installer: https://github.com/ShiftMediaProject/VSNASM
-* Create environment variable: Name=NASM, Variable Value=C:\Program Files\NASM
+* Create environment variable: Name=NASMPATH, Variable Value=C:\Program Files\NASM
 
 ### To Do
 Add other micro benchmarks. Create a WPF UI.
