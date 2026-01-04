@@ -1,0 +1,557 @@
+<UserControl x:Class="MicroBenchX.UI.Views.PpcView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             d:DesignHeight="700"
+             d:DesignWidth="1000"
+             Background="{StaticResource ContentBackgroundBrush}">
+
+    <Grid Margin="20">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="320" />
+        </Grid.ColumnDefinitions>
+
+        <!-- Left Panel: Main Content -->
+        <Grid Grid.Column="0" Margin="0,0,20,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <!-- Header -->
+            <TextBlock Grid.Row="0"
+                       Text="{Binding Header}"
+                       Style="{StaticResource TabHeaderStyle}" />
+
+            <!-- Description -->
+            <TextBlock Grid.Row="1"
+                       Text="{Binding Description}"
+                       Style="{StaticResource DescriptionStyle}"
+                       Margin="0,5,0,20" />
+
+            <!-- Hardware Info Bar -->
+            <Border Grid.Row="2"
+                    Background="{StaticResource ChartBackgroundBrush}"
+                    CornerRadius="8"
+                    Padding="16"
+                    Margin="0,0,0,20">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0" Orientation="Vertical">
+                        <TextBlock Text="CPU"
+                                   FontSize="11"
+                                   Foreground="{StaticResource TextSecondaryBrush}" />
+                        <TextBlock Text="{Binding CpuName}"
+                                   FontSize="14"
+                                   FontWeight="Medium"
+                                   Foreground="{StaticResource TextPrimaryBrush}"
+                                   TextTrimming="CharacterEllipsis" />
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="1" Orientation="Vertical" Margin="30,0">
+                        <TextBlock Text="Physical Cores"
+                                   FontSize="11"
+                                   Foreground="{StaticResource TextSecondaryBrush}" />
+                        <TextBlock Text="{Binding CoreCount}"
+                                   FontSize="14"
+                                   FontWeight="Medium"
+                                   Foreground="{StaticResource TextPrimaryBrush}" />
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="2" Orientation="Vertical" Margin="0,0,30,0">
+                        <TextBlock Text="Logical Processors"
+                                   FontSize="11"
+                                   Foreground="{StaticResource TextSecondaryBrush}" />
+                        <TextBlock Text="{Binding ThreadCount}"
+                                   FontSize="14"
+                                   FontWeight="Medium"
+                                   Foreground="{StaticResource TextPrimaryBrush}" />
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="3" Orientation="Vertical"
+                                Visibility="{Binding IsHybridCpu, Converter={StaticResource BoolToVisibilityConverter}}">
+                        <TextBlock Text="Architecture"
+                                   FontSize="11"
+                                   Foreground="{StaticResource TextSecondaryBrush}" />
+                        <TextBlock Text="Hybrid (P+E)"
+                                   FontSize="14"
+                                   FontWeight="Medium"
+                                   Foreground="{StaticResource PrimaryBrush}" />
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- Core Selection Grid -->
+            <Border Grid.Row="3"
+                    Background="{StaticResource ChartBackgroundBrush}"
+                    CornerRadius="8"
+                    Padding="16"
+                    Margin="0,0,0,20">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <!-- Core Selection Header -->
+                    <Grid Grid.Row="0" Margin="0,0,0,12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Core Selection"
+                                       FontSize="14"
+                                       FontWeight="SemiBold"
+                                       Foreground="{StaticResource TextPrimaryBrush}"
+                                       VerticalAlignment="Center" />
+                            <TextBlock VerticalAlignment="Center" Margin="10,0,0,0">
+                                <Run Text="(" Foreground="{StaticResource TextSecondaryBrush}" />
+                                <Run Text="{Binding SelectedCoreCount, Mode=OneWay}"
+                                     Foreground="{StaticResource PrimaryBrush}"
+                                     FontWeight="Medium" />
+                                <Run Text=" selected)" Foreground="{StaticResource TextSecondaryBrush}" />
+                            </TextBlock>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="1" Orientation="Horizontal">
+                            <Button Content="All"
+                                    Command="{Binding SelectAllCoresCommand}"
+                                    Style="{StaticResource SmallButtonStyle}"
+                                    Margin="0,0,5,0" />
+                            <Button Content="None"
+                                    Command="{Binding SelectNoCoresCommand}"
+                                    Style="{StaticResource SmallButtonStyle}"
+                                    Margin="0,0,5,0" />
+                            <Button Content="Physical"
+                                    Command="{Binding SelectPhysicalCoresCommand}"
+                                    Style="{StaticResource SmallButtonStyle}"
+                                    ToolTip="Select first thread of each physical core"
+                                    Margin="0,0,5,0" />
+                            <Button Content="P-Cores"
+                                    Command="{Binding SelectPCoresCommand}"
+                                    Style="{StaticResource SmallButtonStyle}"
+                                    ToolTip="Select Performance cores"
+                                    Visibility="{Binding IsHybridCpu, Converter={StaticResource BoolToVisibilityConverter}}"
+                                    Margin="0,0,5,0" />
+                            <Button Content="E-Cores"
+                                    Command="{Binding SelectECoresCommand}"
+                                    Style="{StaticResource SmallButtonStyle}"
+                                    ToolTip="Select Efficiency cores"
+                                    Visibility="{Binding IsHybridCpu, Converter={StaticResource BoolToVisibilityConverter}}" />
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- Legend -->
+                    <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,12">
+                        <TextBlock Text="Click to select/deselect"
+                                   FontSize="12"
+                                   Foreground="{StaticResource TextSecondaryBrush}"
+                                   VerticalAlignment="Center" />
+                        <TextBlock Text=" | "
+                                   FontSize="12"
+                                   Foreground="{StaticResource TextSecondaryBrush}"
+                                   VerticalAlignment="Center"
+                                   Visibility="{Binding IsHybridCpu, Converter={StaticResource BoolToVisibilityConverter}}" />
+                        <Border Background="#10B981" CornerRadius="2" Padding="4,1" Margin="5,0"
+                                Visibility="{Binding IsHybridCpu, Converter={StaticResource BoolToVisibilityConverter}}">
+                            <TextBlock Text="P" FontSize="10" Foreground="White" FontWeight="Bold" />
+                        </Border>
+                        <TextBlock Text="P-Core"
+                                   FontSize="11"
+                                   Foreground="{StaticResource TextSecondaryBrush}"
+                                   VerticalAlignment="Center"
+                                   Visibility="{Binding IsHybridCpu, Converter={StaticResource BoolToVisibilityConverter}}" />
+                        <Border Background="#F59E0B" CornerRadius="2" Padding="4,1" Margin="10,0,5,0"
+                                Visibility="{Binding IsHybridCpu, Converter={StaticResource BoolToVisibilityConverter}}">
+                            <TextBlock Text="E" FontSize="10" Foreground="White" FontWeight="Bold" />
+                        </Border>
+                        <TextBlock Text="E-Core"
+                                   FontSize="11"
+                                   Foreground="{StaticResource TextSecondaryBrush}"
+                                   VerticalAlignment="Center"
+                                   Visibility="{Binding IsHybridCpu, Converter={StaticResource BoolToVisibilityConverter}}" />
+                    </StackPanel>
+
+                    <!-- Core Grid -->
+                    <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
+                        <ItemsControl ItemsSource="{Binding Cores}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <UniformGrid Columns="8" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="3" ToolTip="{Binding Index, StringFormat='Thread {0}'}">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="*" />
+                                            <RowDefinition Height="Auto" />
+                                        </Grid.RowDefinitions>
+
+                                        <!-- Core Type Badge (Left side, Top aligned) -->
+                                        <Border Grid.Column="0" Grid.Row="0"
+                                                VerticalAlignment="Top"
+                                                Margin="0,0,4,0"
+                                                CornerRadius="3"
+                                                Padding="4,2"
+                                                MinWidth="20"
+                                                Visibility="{Binding CoreTypeLabel, Converter={StaticResource NullToCollapsedConverter}}">
+                                            <Border.Style>
+                                                <Style TargetType="Border">
+                                                    <Setter Property="Background" Value="#10B981" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding CoreTypeLabel}" Value="E">
+                                                            <Setter Property="Background" Value="#F59E0B" />
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding CoreTypeLabel}" Value="LPE">
+                                                            <Setter Property="Background" Value="#EF4444" />
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding CoreTypeLabel}" Value="D">
+                                                            <Setter Property="Background" Value="#8B5CF6" />
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding CoreTypeLabel}" Value="">
+                                                            <Setter Property="Visibility" Value="Collapsed" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Border.Style>
+                                            <TextBlock Text="{Binding CoreTypeLabel}"
+                                                       FontSize="10"
+                                                       FontWeight="Bold"
+                                                       Foreground="White"
+                                                       HorizontalAlignment="Center" />
+                                        </Border>
+
+                                        <!-- Core Button -->
+                                        <Button Grid.Column="1" Grid.Row="0"
+                                                Style="{StaticResource CoreButtonLargeStyle}"
+                                                Command="{Binding DataContext.ToggleCoreCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                CommandParameter="{Binding}">
+                                            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                                                <TextBlock Text="{Binding Index}"
+                                                           FontSize="16"
+                                                           FontWeight="SemiBold"
+                                                           HorizontalAlignment="Center" />
+                                                <TextBlock Text="{Binding Load, StringFormat='{}{0:F0}%'}"
+                                                           FontSize="10"
+                                                           HorizontalAlignment="Center">
+                                                    <TextBlock.Style>
+                                                        <Style TargetType="TextBlock">
+                                                            <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}" />
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                                                    <Setter Property="Foreground" Value="White" />
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding IsActive}" Value="True">
+                                                                    <Setter Property="Foreground" Value="White" />
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </TextBlock.Style>
+                                                </TextBlock>
+                                            </StackPanel>
+                                        </Button>
+
+                                        <!-- Load Bar (Below button, matching button width) -->
+                                        <Border x:Name="LoadBarContainer" Grid.Column="1" Grid.Row="1"
+                                                Height="6"
+                                                Margin="0,4,0,0"
+                                                CornerRadius="3"
+                                                Background="#E5E7EB">
+                                            <Grid>
+                                                <Border HorizontalAlignment="Stretch"
+                                                        CornerRadius="3">
+                                                    <Border.Width>
+                                                        <MultiBinding Converter="{StaticResource LoadToPercentWidthConverter}">
+                                                            <Binding Path="Load" />
+                                                            <Binding Path="ActualWidth" ElementName="LoadBarContainer" />
+                                                        </MultiBinding>
+                                                    </Border.Width>
+                                                    <Border.Style>
+                                                        <Style TargetType="Border">
+                                                            <Setter Property="Background" Value="#10B981" />
+                                                            <Setter Property="HorizontalAlignment" Value="Left" />
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding Load, Converter={StaticResource LoadToHighConverter}}" Value="True">
+                                                                    <Setter Property="Background" Value="#EF4444" />
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Border.Style>
+                                                </Border>
+                                            </Grid>
+                                        </Border>
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </Grid>
+            </Border>
+
+            <!-- Controls & Status -->
+            <Grid Grid.Row="4">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <Button Grid.Column="0"
+                        Content="Start Benchmark"
+                        Command="{Binding StartBenchmarkCommand}"
+                        IsEnabled="{Binding CanStart}"
+                        Style="{StaticResource PrimaryButtonStyle}"
+                        Margin="0,0,10,0" />
+
+                <Button Grid.Column="1"
+                        Content="Stop"
+                        Command="{Binding StopBenchmarkCommand}"
+                        IsEnabled="{Binding IsRunning}"
+                        Style="{StaticResource SecondaryButtonStyle}" />
+
+                <TextBlock Grid.Column="2"
+                           Text="{Binding StatusMessage}"
+                           VerticalAlignment="Center"
+                           HorizontalAlignment="Right"
+                           FontSize="13"
+                           Foreground="{StaticResource TextSecondaryBrush}" />
+            </Grid>
+        </Grid>
+
+        <!-- Right Panel: Scenario Selection & Results -->
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <!-- Scenario Selection -->
+            <Border Grid.Row="0"
+                    Background="{StaticResource ChartBackgroundBrush}"
+                    CornerRadius="8"
+                    Padding="16"
+                    Margin="0,0,0,20">
+                <StackPanel>
+                    <TextBlock Text="Benchmark Scenario"
+                               FontSize="14"
+                               FontWeight="SemiBold"
+                               Foreground="{StaticResource TextPrimaryBrush}"
+                               Margin="0,0,0,12" />
+
+                    <ComboBox ItemsSource="{Binding Scenarios}"
+                              SelectedItem="{Binding SelectedScenario}"
+                              Style="{StaticResource ModernComboBoxStyle}"
+                              IsEnabled="{Binding IsRunning, Converter={StaticResource InverseBoolConverter}}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Margin="0,4">
+                                    <TextBlock Text="{Binding Name}"
+                                               FontWeight="Medium" />
+                                    <TextBlock Text="{Binding Description}"
+                                               FontSize="11"
+                                               Foreground="{StaticResource TextSecondaryBrush}"
+                                               TextWrapping="Wrap" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+
+                    <Border Background="{StaticResource ContentBackgroundBrush}"
+                            CornerRadius="6"
+                            Padding="12"
+                            Margin="0,12,0,0"
+                            Visibility="{Binding SelectedScenario, Converter={StaticResource NullToCollapsedConverter}}">
+                        <StackPanel>
+                            <TextBlock Text="{Binding SelectedScenario.Category}"
+                                       FontSize="11"
+                                       FontWeight="Medium"
+                                       Foreground="{StaticResource PrimaryBrush}"
+                                       Margin="0,0,0,4" />
+                            <TextBlock Text="{Binding SelectedScenario.Description}"
+                                       FontSize="12"
+                                       Foreground="{StaticResource TextSecondaryBrush}"
+                                       TextWrapping="Wrap" />
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </Border>
+
+            <!-- Results Panel -->
+            <Border Grid.Row="1"
+                    Background="{StaticResource ChartBackgroundBrush}"
+                    CornerRadius="8"
+                    Padding="16">
+                <Grid>
+                    <StackPanel Visibility="{Binding HasResults, Converter={StaticResource BoolToVisibilityConverter}}">
+                        <TextBlock Text="Results"
+                                   FontSize="14"
+                                   FontWeight="SemiBold"
+                                   Foreground="{StaticResource TextPrimaryBrush}"
+                                   Margin="0,0,0,16" />
+
+                        <!-- Score -->
+                        <Border Background="{StaticResource ContentBackgroundBrush}"
+                                CornerRadius="8"
+                                Padding="16"
+                                Margin="0,0,0,12">
+                            <StackPanel HorizontalAlignment="Center">
+                                <TextBlock Text="Score"
+                                           FontSize="11"
+                                           Foreground="{StaticResource TextSecondaryBrush}"
+                                           HorizontalAlignment="Center" />
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                    <TextBlock Text="{Binding BenchmarkScore, StringFormat='{}{0:F2}'}"
+                                               FontSize="32"
+                                               FontWeight="Bold"
+                                               Foreground="{StaticResource PrimaryBrush}" />
+                                    <TextBlock Text="{Binding ScoreUnit}"
+                                               FontSize="14"
+                                               Foreground="{StaticResource TextSecondaryBrush}"
+                                               VerticalAlignment="Bottom"
+                                               Margin="6,0,0,6" />
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- PPC -->
+                        <Border Background="{StaticResource ContentBackgroundBrush}"
+                                CornerRadius="8"
+                                Padding="16"
+                                Margin="0,0,0,12">
+                            <StackPanel HorizontalAlignment="Center">
+                                <TextBlock Text="Performance Per Clock"
+                                           FontSize="11"
+                                           Foreground="{StaticResource TextSecondaryBrush}"
+                                           HorizontalAlignment="Center" />
+                                <TextBlock Text="{Binding PerformancePerClock, StringFormat='{}{0:F4}'}"
+                                           FontSize="28"
+                                           FontWeight="Bold"
+                                           Foreground="{StaticResource TextPrimaryBrush}"
+                                           HorizontalAlignment="Center" />
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Frequency Stats -->
+                        <TextBlock Text="Frequency Statistics"
+                                   FontSize="12"
+                                   FontWeight="Medium"
+                                   Foreground="{StaticResource TextPrimaryBrush}"
+                                   Margin="0,8,0,8" />
+
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" Grid.Column="0"
+                                       Text="Average"
+                                       FontSize="11"
+                                       Foreground="{StaticResource TextSecondaryBrush}" />
+                            <TextBlock Grid.Row="0" Grid.Column="1"
+                                       Text="{Binding AverageFrequencyMHz, StringFormat='{}{0:F0} MHz'}"
+                                       FontSize="12"
+                                       FontWeight="Medium"
+                                       HorizontalAlignment="Right" />
+
+                            <TextBlock Grid.Row="1" Grid.Column="0"
+                                       Text="Minimum"
+                                       FontSize="11"
+                                       Foreground="{StaticResource TextSecondaryBrush}"
+                                       Margin="0,4,0,0" />
+                            <TextBlock Grid.Row="1" Grid.Column="1"
+                                       Text="{Binding MinFrequencyMHz, StringFormat='{}{0:F0} MHz'}"
+                                       FontSize="12"
+                                       HorizontalAlignment="Right"
+                                       Margin="0,4,0,0" />
+
+                            <TextBlock Grid.Row="2" Grid.Column="0"
+                                       Text="Maximum"
+                                       FontSize="11"
+                                       Foreground="{StaticResource TextSecondaryBrush}"
+                                       Margin="0,4,0,0" />
+                            <TextBlock Grid.Row="2" Grid.Column="1"
+                                       Text="{Binding MaxFrequencyMHz, StringFormat='{}{0:F0} MHz'}"
+                                       FontSize="12"
+                                       HorizontalAlignment="Right"
+                                       Margin="0,4,0,0" />
+                        </Grid>
+
+                        <!-- Additional Info -->
+                        <Border BorderBrush="{StaticResource BorderBrush}"
+                                BorderThickness="0,1,0,0"
+                                Margin="0,16,0,0"
+                                Padding="0,12,0,0">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel Grid.Column="0">
+                                    <TextBlock Text="Duration"
+                                               FontSize="11"
+                                               Foreground="{StaticResource TextSecondaryBrush}" />
+                                    <TextBlock Text="{Binding BenchmarkDuration, StringFormat='{}{0:mm\\:ss\\.ff}'}"
+                                               FontSize="12"
+                                               FontWeight="Medium" />
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="1">
+                                    <TextBlock Text="Samples"
+                                               FontSize="11"
+                                               Foreground="{StaticResource TextSecondaryBrush}" />
+                                    <TextBlock Text="{Binding SampleCount}"
+                                               FontSize="12"
+                                               FontWeight="Medium" />
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                    </StackPanel>
+
+                    <!-- No Results Placeholder -->
+                    <StackPanel Visibility="{Binding HasResults, Converter={StaticResource InverseBoolToVisibilityConverter}}"
+                                VerticalAlignment="Center"
+                                HorizontalAlignment="Center">
+                        <TextBlock Text="No Results Yet"
+                                   FontSize="14"
+                                   Foreground="{StaticResource TextSecondaryBrush}"
+                                   HorizontalAlignment="Center" />
+                        <TextBlock Text="Select cores and run a benchmark to see results"
+                                   FontSize="12"
+                                   Foreground="{StaticResource TextSecondaryBrush}"
+                                   HorizontalAlignment="Center"
+                                   TextWrapping="Wrap"
+                                   TextAlignment="Center"
+                                   Margin="0,8,0,0" />
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </Grid>
+    </Grid>
+</UserControl>

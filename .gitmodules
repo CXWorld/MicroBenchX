@@ -1,0 +1,3 @@
+[submodule "external/CapFrameX"]
+	path = external/CapFrameX
+	url = https://github.com/CXWorld/CapFrameX.git
