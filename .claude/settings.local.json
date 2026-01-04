@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dir:*)",
+      "Bash(cat:*)",
+      "Bash(tree:*)",
+      "Bash(dotnet build:*)",
+      "Bash(nuget restore:*)",
+      "Bash(dotnet restore:*)",
+      "Bash(msbuild:*)",
+      "Bash(dotnet msbuild:*)",
+      "Bash(curl:*)",
+      "Bash(./nuget.exe restore:*)",
+      "Bash(git fetch:*)",
+      "Bash(git checkout:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nAdd new UI with core grid, hardware monitoring, and benchmarks\n\n- Replace old MicroBenchX project with new MicroBenchX.UI \\(WPF/.NET 9\\)\n- Add MicroBenchX.Benchmark library with AVX2, image processing, compression, cache, and memory benchmarks\n- Add CapFrameX submodule for LibreHardwareMonitor integration\n- Implement HardwareMonitorService for CPU load and core type detection\n- Add PPC tab with interactive core selection grid showing:\n  - Core type badges \\(P/E/LPE/D\\) for hybrid CPUs\n  - Live CPU load percentage per core\n  - Load bar visualization below each core button\n- Use LibreHardwareMonitor ThreadAffinity for thread pinning\n- Add MVVM architecture with CommunityToolkit.Mvvm and DI\n\n🤖 Generated with [Claude Code]\\(https://claude.com/claude-code\\)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")"
+    ]
+  }
+}
